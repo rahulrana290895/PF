@@ -6,11 +6,13 @@ import {
   Text,
   StyleSheet,
   Alert,
-  ScrollView
+  ScrollView,
+  NativeModules
 } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const { SmsModule } = NativeModules; // ✅ Native bridge
 
 export default function SmsTemplate() {
 
@@ -18,13 +20,11 @@ export default function SmsTemplate() {
   const [outgoing, setOutgoing] = useState('');
   const [missed, setMissed] = useState('');
 
-useEffect(() => {
-  loadData();
-}, []);
+  useEffect(() => {
+    loadData();
+  }, []);
 
-
-
-const loadData = async () => {
+  const loadData = async () => {
     try {
       const inc = await AsyncStorage.getItem('sms_incoming');
       const out = await AsyncStorage.getItem('sms_outgoing');
@@ -35,7 +35,7 @@ const loadData = async () => {
       if (mis) setMissed(mis);
 
     } catch (e) {
-      console.log(e);
+      console.log("LOAD ERROR:", e);
     }
   };
 
@@ -48,10 +48,17 @@ const loadData = async () => {
       await AsyncStorage.setItem('sms_outgoing', outgoing);
       await AsyncStorage.setItem('sms_missed', missed);
 
-      Alert.alert('Success', 'All Templates Saved');
+      // ✅ Native (SharedPreferences ke liye)
+      if (SmsModule) {
+        SmsModule.saveTemplates(incoming, outgoing, missed);
+      } else {
+        console.log("SmsModule not found");
+      }
+
+      Alert.alert('Success', 'Saved in Async + Native');
 
     } catch (e) {
-      console.log(e);
+      console.log("SAVE ERROR:", e);
     }
   };
 
