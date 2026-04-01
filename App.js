@@ -13,6 +13,7 @@ import UpgradeScreen from './src/UpgradeScreen';
 
 import WhatsappTemplate from './src/WhatsappTemplate';
 import SettingScreen from './src/SettingScreen';
+import SmsTemplate from './src/SmsTemplate';
 
 
 import { BASE_URL } from './src/config/config';
@@ -117,6 +118,7 @@ if (loading) {
               />
         <Stack.Screen name="WhatsappTemplate" component={WhatsappTemplate} />
         <Stack.Screen name="SettingScreen" component={SettingScreen} />
+        <Stack.Screen name="SmsTemplate" component={SmsTemplate} />
 
               </>
 
