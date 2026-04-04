@@ -9,7 +9,7 @@ import {
   ScrollView,
   NativeModules
 } from 'react-native';
-
+import { PermissionsAndroid } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { SmsModule } = NativeModules; // ✅ Native bridge
@@ -22,6 +22,7 @@ export default function SmsTemplate() {
 
   useEffect(() => {
     loadData();
+    requestPermission();
   }, []);
 
   const loadData = async () => {
@@ -38,8 +39,6 @@ export default function SmsTemplate() {
       console.log("LOAD ERROR:", e);
     }
   };
-
-  // ✅ Save BOTH (AsyncStorage + Native)
   const save = async () => {
     try {
 
@@ -51,17 +50,35 @@ export default function SmsTemplate() {
       // ✅ Native (SharedPreferences ke liye)
       if (SmsModule) {
         SmsModule.saveTemplates(incoming, outgoing, missed);
+        setTimeout(() => {
+          SmsModule.startCallService();
+        }, 500);
+
       } else {
         console.log("SmsModule not found");
       }
-
+        console.log(SmsModule);
       Alert.alert('Success', 'Saved in Async + Native');
 
     } catch (e) {
       console.log("SAVE ERROR:", e);
     }
   };
+  const requestPermission = async () => {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE
+    );
 
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      console.log("✅ Permission Granted");
+    } else {
+      console.log("❌ Permission Denied");
+    }
+  } catch (err) {
+    console.warn(err);
+  }
+};
   return (
     <ScrollView style={styles.container}>
 

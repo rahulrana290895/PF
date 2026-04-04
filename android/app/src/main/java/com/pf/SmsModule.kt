@@ -1,6 +1,7 @@
 package com.pf
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import com.facebook.react.bridge.*
 
@@ -27,5 +28,12 @@ class SmsModule(reactContext: ReactApplicationContext) :
         Log.d("SMS_DEBUG", "Incoming: $incoming")
         Log.d("SMS_DEBUG", "Outgoing: $outgoing")
         Log.d("SMS_DEBUG", "Missed: $missed")
+    }
+
+    @ReactMethod
+    fun startCallService() {
+        Log.d("CALL_DEBUG", "SMS Module tak chal raha hai")
+        val intent = Intent(reactApplicationContext, CallService::class.java)
+        reactApplicationContext.startForegroundService(intent)
     }
 }
