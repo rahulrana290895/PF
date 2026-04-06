@@ -15,6 +15,7 @@ class MainApplication : Application(), ReactApplication {
       context = applicationContext,
       packageList = PackageList(this).packages.apply {
         add(SmsPackage())
+        add(AccessibilityPackage())
       }
     )
   }
