@@ -37,7 +37,7 @@ export default function HomeScreen({ navigation }) {
               <Text style={styles.cardText}>SMS Template</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('WhatsappTemplate')}>
+            <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('WhatsappSms')}>
               <Image source={require('./assets/wa.png')} style={styles.iconImg} />
               <Text style={styles.cardText}>Whatsapp Template</Text>
             </TouchableOpacity>

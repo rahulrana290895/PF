@@ -12,9 +12,10 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { launchImageLibrary } from 'react-native-image-picker';
 
-export default function WhatsappTemplate() {
+export default function WhatsappSms() {
   const [message, setMessage] = useState('');
   const [image, setImage] = useState(null);
+  const [numbers, setNumbers] = useState(''); // ✅ NEW STATE
 
   useEffect(() => {
     loadData();
@@ -23,8 +24,11 @@ export default function WhatsappTemplate() {
   const loadData = async () => {
     const msg = await AsyncStorage.getItem('waTemplate');
     const img = await AsyncStorage.getItem('waImage');
+    const nums = await AsyncStorage.getItem('waNumbers');
+
     if (msg) setMessage(msg);
     if (img) setImage(img);
+    if (nums) setNumbers(nums);
   };
 
   const pickImage = () => {
@@ -37,20 +41,26 @@ export default function WhatsappTemplate() {
 
   const save = async () => {
     await AsyncStorage.setItem('waTemplate', message);
+    await AsyncStorage.setItem('waNumbers', numbers); // ✅ SAVE NUMBERS
     if (image) await AsyncStorage.setItem('waImage', image);
+
     Alert.alert('Success', 'WhatsApp Template Saved');
+  };
+
+  // ✅ Convert numbers into array
+  const getNumberArray = () => {
+    return numbers
+      .split(/[\n,]+/) // comma ya new line se split
+      .map(num => num.trim())
+      .filter(num => num.length > 0);
   };
 
   return (
     <ScrollView style={styles.container}>
-
-      {/* Header */}
-
-      {/* Card */}
       <View style={styles.card}>
-      <Text style={styles.title}>WhatsApp Template</Text>
-      <Text style={styles.subtitle}>Create auto message with optional image</Text>
+        <Text style={styles.title}>Bulk WhatsApp</Text>
 
+        {/* MESSAGE */}
         <Text style={styles.label}>Message</Text>
         <TextInput
           multiline
@@ -61,27 +71,45 @@ export default function WhatsappTemplate() {
           onChangeText={setMessage}
         />
 
-        {/* Image Picker */}
+        {/* BULK NUMBERS */}
+        <Text style={styles.label}>Bulk Numbers</Text>
+        <TextInput
+          multiline
+          placeholder="Enter numbers (comma or new line)..[9185XXXXXX09,9189XXXXXX42]."
+          placeholderTextColor="#888"
+          style={[styles.input, { height: 120 }]}
+          value={numbers}
+          onChangeText={setNumbers}
+        />
+
+        {/* IMAGE PICKER */}
         <TouchableOpacity style={styles.imageBtn} onPress={pickImage}>
           <Text style={styles.imageBtnText}>
             {image ? 'Change Image' : 'Select Image'}
           </Text>
         </TouchableOpacity>
 
-        {/* Preview */}
+        {/* PREVIEW */}
         {image && (
           <View style={styles.previewBox}>
             <Image source={{ uri: image }} style={styles.previewImg} />
           </View>
         )}
 
-        {/* Save */}
+        {/* SAVE */}
         <TouchableOpacity style={styles.saveBtn} onPress={save}>
           <Text style={styles.saveText}>Save Template</Text>
         </TouchableOpacity>
 
-      </View>
+        {/* DEBUG BUTTON (optional) */}
+        <TouchableOpacity
+          style={[styles.saveBtn, { backgroundColor: '#333' }]}
+          onPress={() => console.log(getNumberArray())}
+        >
+          <Text style={styles.saveText}>Check Numbers Console</Text>
+        </TouchableOpacity>
 
+      </View>
     </ScrollView>
   );
 }

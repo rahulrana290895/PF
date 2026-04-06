@@ -11,7 +11,7 @@ import HomeScreen from './src/HomeScreen';
 import UpdateLicenseScreen from './src/UpdateLicenseScreen';
 import UpgradeScreen from './src/UpgradeScreen';
 
-import WhatsappTemplate from './src/WhatsappTemplate';
+import WhatsappSms from './src/WhatsappSms';
 import SettingScreen from './src/SettingScreen';
 import SmsTemplate from './src/SmsTemplate';
 
@@ -116,7 +116,7 @@ if (loading) {
                   headerTintColor: '#fff',
                 })}
               />
-        <Stack.Screen name="WhatsappTemplate" component={WhatsappTemplate} />
+        <Stack.Screen name="WhatsappSms" component={WhatsappSms} />
         <Stack.Screen name="SettingScreen" component={SettingScreen} />
         <Stack.Screen name="SmsTemplate" component={SmsTemplate} />
 
