@@ -64,21 +64,31 @@ export default function SmsTemplate() {
       console.log("SAVE ERROR:", e);
     }
   };
-  const requestPermission = async () => {
-  try {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE
-    );
 
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log("✅ Permission Granted");
+const requestPermission = async () => {
+  try {
+    const granted = await PermissionsAndroid.requestMultiple([
+      PermissionsAndroid.PERMISSIONS.SEND_SMS,
+      PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
+      PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE,
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS, // Android 13+
+    ]);
+
+    if (
+      granted['android.permission.SEND_SMS'] === PermissionsAndroid.RESULTS.GRANTED &&
+      granted['android.permission.READ_CALL_LOG'] === PermissionsAndroid.RESULTS.GRANTED &&
+      granted['android.permission.READ_PHONE_STATE'] === PermissionsAndroid.RESULTS.GRANTED
+    ) {
+      console.log("✅ All Permissions Granted");
     } else {
-      console.log("❌ Permission Denied");
+      console.log("❌ Some Permissions Denied");
     }
+
   } catch (err) {
     console.warn(err);
   }
 };
+
   return (
     <ScrollView style={styles.container}>
 
