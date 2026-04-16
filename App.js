@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { enableScreens } from 'react-native-screens';
 
 import LoginScreen from './src/LoginScreen';
+import RegisterScreen from './src/RegisterScreen';
 import HomeScreen from './src/HomeScreen';
 import UpdateLicenseScreen from './src/UpdateLicenseScreen';
 import UpgradeScreen from './src/UpgradeScreen';
@@ -14,6 +15,8 @@ import UpgradeScreen from './src/UpgradeScreen';
 import WhatsappSms from './src/WhatsappSms';
 import SettingScreen from './src/SettingScreen';
 import SmsTemplate from './src/SmsTemplate';
+import ProfileScreen from './src/ProfileScreen';
+import HelpScreen from './src/HelpScreen';
 
 
 import { BASE_URL } from './src/config/config';
@@ -87,9 +90,12 @@ if (loading) {
     <NavigationContainer>
         <Stack.Navigator>
           {!isLoggedIn ? (
+          <>
               <Stack.Screen name="LoginScreen" options={{ headerShown: false }}>
                 {(props) => <LoginScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
               </Stack.Screen>
+              <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+          </>
           ) : !isLicenseValid ? (
             <Stack.Screen
                 name="Update License Key"
@@ -119,11 +125,9 @@ if (loading) {
         <Stack.Screen name="WhatsappSms" component={WhatsappSms} />
         <Stack.Screen name="SettingScreen" component={SettingScreen} />
         <Stack.Screen name="SmsTemplate" component={SmsTemplate} />
-
-              </>
-
-
-
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="HelpScreen" component={HelpScreen} />
+          </>
           )}
 
 

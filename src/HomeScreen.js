@@ -60,6 +60,25 @@ export default function HomeScreen({ navigation }) {
 
           </View>
 
+          <View style={styles.row}>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('ProfileScreen')}
+          >
+            <Image source={require('./assets/user.png')} style={styles.iconImg} />
+            <Text style={styles.cardText}>Profile</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('HelpScreen')}
+          >
+            <Image source={require('./assets/helpline.png')} style={styles.iconImg} />
+            <Text style={styles.cardText}>Helpline</Text>
+          </TouchableOpacity>
+
+          </View>
+
         </View>
 
       </ScrollView>

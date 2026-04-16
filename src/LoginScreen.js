@@ -114,6 +114,17 @@ const LoginScreen = (props) => {
           {loading ? 'Logging in...' : 'Login'}
         </Text>
       </TouchableOpacity>
+
+      <Text style={{ textAlign: 'center', marginTop: 15 }}>
+        Don't have an account?{' '}
+        <Text
+          style={{ color: 'teal', fontWeight: 'bold' }}
+          onPress={() => navigation.navigate('RegisterScreen')}
+        >
+          Register
+        </Text>
+      </Text>
+
     </View>
   );
 };
