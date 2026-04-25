@@ -10,11 +10,11 @@ import {
 export default function HelpScreen() {
 
   const callNumber = () => {
-    Linking.openURL('tel:8529171609');
+    Linking.openURL('tel:7581038756');
   };
 
   const openWhatsapp = () => {
-    Linking.openURL('https://wa.me/918529171609');
+    Linking.openURL('https://wa.me/917581038756');
   };
 
   const sendEmail = () => {
@@ -29,19 +29,19 @@ export default function HelpScreen() {
       {/* Contact Number */}
       <TouchableOpacity style={styles.card} onPress={callNumber}>
         <Text style={styles.title}>📞 Contact Number</Text>
-        <Text style={styles.value}>8529171609</Text>
+        <Text style={styles.value}>7581038756</Text>
       </TouchableOpacity>
 
       {/* Whatsapp */}
       <TouchableOpacity style={styles.card} onPress={openWhatsapp}>
         <Text style={styles.title}>💬 Whatsapp</Text>
-        <Text style={styles.value}>8529171609</Text>
+        <Text style={styles.value}>7581038756</Text>
       </TouchableOpacity>
 
       {/* Email */}
       <TouchableOpacity style={styles.card} onPress={sendEmail}>
         <Text style={styles.title}>📧 Email</Text>
-        <Text style={styles.value}>info@parfectsolution.com</Text>
+        <Text style={styles.value}>info@perfectsolution.com</Text>
       </TouchableOpacity>
 
     </View>

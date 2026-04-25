@@ -126,10 +126,15 @@ class CallReceiver : BroadcastReceiver() {
         try {
             if (number == null || message.isEmpty()) return
 
-            val smsManager = SmsManager.getDefault()
-            smsManager.sendTextMessage(number, null, message, null, null)
+            val cleanMsg = message.replace("\n", " ").trim()
 
-            Log.e("SMS_SEND", "✅ SMS Sent to $number : $message")
+            val smsManager = SmsManager.getDefault()
+
+            val parts = smsManager.divideMessage(cleanMsg)
+            smsManager.sendMultipartTextMessage(number, null, parts, null, null)
+
+            Log.e("SMS_SEND", "✅ SMS Sent to $number : $cleanMsg")
+
         } catch (e: Exception) {
             Log.e("SMS_SEND", "❌ Failed: ${e.message}")
         }

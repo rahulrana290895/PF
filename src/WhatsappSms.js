@@ -7,9 +7,12 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
-  Linking,
-  NativeModules
+  NativeModules,
+  Image,
+  Linking
 } from 'react-native';
+
+import { launchImageLibrary } from 'react-native-image-picker';
 
 const { AccessibilityModule } = NativeModules;
 
@@ -17,6 +20,7 @@ export default function WhatsappSms() {
 
   const [message, setMessage] = useState('');
   const [numbers, setNumbers] = useState('');
+  const [imageUri, setImageUri] = useState(null);
 
   const getNumberArray = () => {
     return numbers
@@ -27,55 +31,76 @@ export default function WhatsappSms() {
 
   const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
-  const startAutoSend = async () => {
+  // 📷 Image Picker
+  const pickImage = () => {
+    launchImageLibrary({ mediaType: 'photo' }, (res) => {
+      if (!res.didCancel && res.assets?.length > 0) {
+        setImageUri(res.assets[0].uri);
+      }
+    });
+  };
 
-    const nums = getNumberArray();
+const startAutoSend = async () => {
 
-    if (nums.length === 0) {
-      Alert.alert('Error', 'No numbers found');
-      return;
-    }
+  const nums = getNumberArray();
 
-    if (!message) {
-      Alert.alert('Error', 'Message empty hai');
-      return;
-    }
+  if (nums.length === 0) {
+    Alert.alert('Error', 'No numbers found');
+    return;
+  }
 
-    // 🔥 START BULK
-    if (AccessibilityModule) {
-      AccessibilityModule.startBulk();
-    }
-    for (let i = 0; i < nums.length; i++) {
+  if (!message && !imageUri) {
+    Alert.alert('Error', 'Message ya Image hona chahiye');
+    return;
+  }
 
-      let num = nums[i].replace(/\D/g, '');
+  // 🔥 IMPORTANT: image flow pass karo
+  if (AccessibilityModule) {
+    AccessibilityModule.startBulk(!!imageUri);
+  }
 
-      const url = `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
+  for (let i = 0; i < nums.length; i++) {
 
-      try {
+    let num = nums[i].replace(/\D/g, '');
 
-        console.log("Opening:", num);
+    try {
 
-        await Linking.openURL(url);
-
-        await delay(12000);
-
-      } catch (err) {
-
-        console.log("Error:", err);
-
+      // 🔥 IMAGE SAVE (agar image hai)
+      if (imageUri) {
+        console.log(imageUri);
+        AccessibilityModule.saveImageToGallery(imageUri);
+        await delay(2000);
       }
 
+      // 🔥 CASE 1: MESSAGE + IMAGE
+      if (message) {
+        const url = `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
+        await Linking.openURL(url);
+      }
+
+      // 🔥 CASE 2: ONLY IMAGE (VERY IMPORTANT FIX)
+      else {
+        const url = `https://wa.me/${num}`;
+        await Linking.openURL(url);
+      }
+
+      // ⏱️ Delay (image flow me zyada)
+      await delay(imageUri ? 15000 : 8000);
+
+    } catch (err) {
+      console.log("Error:", err);
     }
+  }
 
-    // 🔥 STOP BULK
-    AccessibilityModule.stopBulk();
+  AccessibilityModule.stopBulk();
 
-    Alert.alert('Done', 'Bulk sending completed');
-  };
+  Alert.alert('Done', 'Bulk sending completed');
+};
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.card}>
+
         <Text style={styles.title}>Bulk WhatsApp Sender</Text>
 
         <Text style={styles.label}>Message</Text>
@@ -95,6 +120,16 @@ export default function WhatsappSms() {
           value={numbers}
           onChangeText={setNumbers}
         />
+
+        {/* 📷 Image Picker Button */}
+        <TouchableOpacity style={styles.imageBtn} onPress={pickImage}>
+          <Text style={styles.imageText}>Choose Image</Text>
+        </TouchableOpacity>
+
+        {/* 👀 Preview */}
+        {imageUri && (
+          <Image source={{ uri: imageUri }} style={styles.preview} />
+        )}
 
         <TouchableOpacity
           style={styles.sendBtn}
@@ -145,6 +180,26 @@ const styles = StyleSheet.create({
     padding: 10,
     textAlignVertical: 'top',
     backgroundColor: '#fafafa'
+  },
+
+  imageBtn: {
+    backgroundColor: '#128C7E',
+    padding: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10
+  },
+
+  imageText: {
+    color: '#fff',
+    fontWeight: '600'
+  },
+
+  preview: {
+    width: '100%',
+    height: 200,
+    marginTop: 10,
+    borderRadius: 10
   },
 
   sendBtn: {

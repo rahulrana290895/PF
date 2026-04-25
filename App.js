@@ -117,16 +117,36 @@ if (loading) {
                 name="HomeScreen"
                 component={HomeScreen}
                 options={({ navigation }) => ({
-                  headerTitle: 'ParfectSolution',
+                  headerTitle: 'Perfect Solution',
                   headerStyle: { backgroundColor: 'teal' },
                   headerTintColor: '#fff',
                 })}
               />
-        <Stack.Screen name="WhatsappSms" component={WhatsappSms} />
-        <Stack.Screen name="SettingScreen" component={SettingScreen} />
-        <Stack.Screen name="SmsTemplate" component={SmsTemplate} />
-        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
-        <Stack.Screen name="HelpScreen" component={HelpScreen} />
+        <Stack.Screen name="WhatsappSms" component={WhatsappSms}   options={{
+                                                                     headerTitle: 'Whatsapp SMS',
+                                                                     headerStyle: { backgroundColor: 'teal' },
+                                                                     headerTintColor: '#fff',
+                                                                   }}/>
+        <Stack.Screen name="SettingScreen" component={SettingScreen}   options={{
+                                                                         headerTitle: 'Setting',
+                                                                         headerStyle: { backgroundColor: 'teal' },
+                                                                         headerTintColor: '#fff',
+                                                                       }}/>
+        <Stack.Screen name="SmsTemplate" component={SmsTemplate}   options={{
+                                                                     headerTitle: 'SMS Template',
+                                                                     headerStyle: { backgroundColor: 'teal' },
+                                                                     headerTintColor: '#fff',
+                                                                   }}/>
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen}   options={{
+                                                                         headerTitle: 'Profile',
+                                                                         headerStyle: { backgroundColor: 'teal' },
+                                                                         headerTintColor: '#fff',
+                                                                       }}/>
+        <Stack.Screen name="HelpScreen" component={HelpScreen}   options={{
+                                                                   headerTitle: 'Helpline',
+                                                                   headerStyle: { backgroundColor: 'teal' },
+                                                                   headerTintColor: '#fff',
+                                                                 }}/>
           </>
           )}
 
