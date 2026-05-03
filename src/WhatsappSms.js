@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   TextInput,
@@ -9,9 +9,10 @@ import {
   ScrollView,
   NativeModules,
   Image,
-  Linking
+  Linking,
+  SafeAreaView
 } from 'react-native';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { launchImageLibrary } from 'react-native-image-picker';
 
 const { AccessibilityModule } = NativeModules;
@@ -21,6 +22,7 @@ export default function WhatsappSms() {
   const [message, setMessage] = useState('');
   const [numbers, setNumbers] = useState('');
   const [imageUri, setImageUri] = useState(null);
+  const stopRef = useRef(false);
 
   const getNumberArray = () => {
     return numbers
@@ -41,6 +43,13 @@ export default function WhatsappSms() {
   };
 
 const startAutoSend = async () => {
+   const waType = await AsyncStorage.getItem('waType');
+   const packageName =
+     waType === 'BUSINESS'
+       ? 'com.whatsapp.w4b'
+       : 'com.whatsapp';
+
+  stopRef.current = false; // reset
 
   const nums = getNumberArray();
 
@@ -61,6 +70,11 @@ const startAutoSend = async () => {
 
   for (let i = 0; i < nums.length; i++) {
 
+      if (stopRef.current) {
+        console.log("Stopped by user");
+        break;
+      }
+
     let num = nums[i].replace(/\D/g, '');
 
     try {
@@ -74,8 +88,11 @@ const startAutoSend = async () => {
 
       // 🔥 CASE 1: MESSAGE + IMAGE
       if (message) {
-        const url = `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
-        await Linking.openURL(url);
+        await AccessibilityModule.openWhatsApp(
+          num,
+          message || '',
+          waType || 'WHATSAPP'
+        );
       }
 
       // 🔥 CASE 2: ONLY IMAGE (VERY IMPORTANT FIX)
@@ -97,8 +114,17 @@ const startAutoSend = async () => {
   Alert.alert('Done', 'Bulk sending completed');
 };
 
+const stopAutoSend = () => {
+  stopRef.current = true;
+  if (AccessibilityModule) {
+    AccessibilityModule.stopBulk();
+  }
+  Alert.alert("Stopped", "Process stopped");
+};
+
   return (
-    <ScrollView style={styles.container}>
+  <SafeAreaView style={{ flex: 1, backgroundColor: '#e5ddd5' }}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 50 }}>
       <View style={styles.card}>
 
         <Text style={styles.title}>Bulk WhatsApp Sender</Text>
@@ -138,8 +164,15 @@ const startAutoSend = async () => {
           <Text style={styles.sendText}>Start Bulk Send</Text>
         </TouchableOpacity>
 
+
+<TouchableOpacity style={[styles.sendBtn, { backgroundColor: 'red' }]} onPress={stopAutoSend} >
+  <Text style={styles.sendText}>Stop</Text>
+</TouchableOpacity>
+
+
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

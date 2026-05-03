@@ -7,6 +7,9 @@ import android.os.Environment
 import java.io.File
 import android.util.Log
 import android.media.MediaScannerConnection
+import android.content.Intent
+import android.net.Uri
+import java.net.URLEncoder
 
 class AccessibilityModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
@@ -51,6 +54,27 @@ class AccessibilityModule(reactContext: ReactApplicationContext) :
                 null
             )
             Log.d("ACC", "Image saved & scanned")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    @ReactMethod
+    fun openWhatsApp(number: String, message: String, type: String) {
+        try {
+            val packageName = if (type == "BUSINESS") {
+                "com.whatsapp.w4b"
+            } else {
+                "com.whatsapp"
+            }
+
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse("https://wa.me/$number?text=${URLEncoder.encode(message, "UTF-8")}")
+            intent.setPackage(packageName)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+            reactApplicationContext.startActivity(intent)
+
         } catch (e: Exception) {
             e.printStackTrace()
         }

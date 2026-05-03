@@ -12,6 +12,8 @@ class MyAccessibilityService : AccessibilityService() {
         var isImageFlow = false
         var step = 0
 
+        var selectedWhatsapp = "WHATSAPP"
+
         fun startBulk(imageFlow: Boolean) {
             bulkRunning = true
             isImageFlow = imageFlow

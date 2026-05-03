@@ -4,24 +4,66 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Alert
+  Alert,
+  NativeModules
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SettingScreen() {
-  const [sim, setSim] = useState('SIM1');
+  const { SmsModule } = NativeModules;
+
+  const [simList, setSimList] = useState([]);
+  const [selectedSim, setSelectedSim] = useState(null);
   const [whatsapp, setWhatsapp] = useState('WHATSAPP');
 
+  // ✅ NEW: WhatsApp installed state
+  const [waApps, setWaApps] = useState({
+    whatsapp: false,
+    business: false
+  });
+
   useEffect(() => {
+    loadSims();
     load();
+    loadWhatsApps(); // 🔥 NEW
   }, []);
 
+  // ✅ Load SIMs
+  const loadSims = async () => {
+    try {
+      const sims = await SmsModule.getAvailableSims();
+      setSimList(sims);
+
+      if (sims.length > 0) {
+        setSelectedSim(sims[0].id);
+      }
+    } catch (e) {
+      console.log("SIM ERROR:", e);
+    }
+  };
+
+  // ✅ Load WhatsApp installed apps
+  const loadWhatsApps = async () => {
+    try {
+      const res = await SmsModule.getInstalledWhatsApps();
+      setWaApps(res);
+
+      // ✅ auto select
+      if (res.whatsapp) setWhatsapp('WHATSAPP');
+      else if (res.business) setWhatsapp('BUSINESS');
+
+    } catch (e) {
+      console.log("WA ERROR:", e);
+    }
+  };
+
+  // ✅ Load saved settings
   const load = async () => {
     try {
-      const s = await AsyncStorage.getItem('sim');
+      const savedSim = await AsyncStorage.getItem('sim');
       const w = await AsyncStorage.getItem('waType');
 
-      if (s) setSim(s);
+      if (savedSim) setSelectedSim(parseInt(savedSim));
       if (w) setWhatsapp(w);
 
     } catch (e) {
@@ -29,9 +71,22 @@ export default function SettingScreen() {
     }
   };
 
+  // ✅ Save settings
   const save = async () => {
     try {
-      await AsyncStorage.setItem('sim', sim);
+      if (!selectedSim) {
+        Alert.alert("Error", "Please select SIM");
+        return;
+      }
+
+      const selectedSimObj = simList.find(s => s.id === selectedSim);
+
+      if (selectedSimObj?.status !== "ACTIVE") {
+        Alert.alert("Error", "Selected SIM is not active");
+        return;
+      }
+
+      await AsyncStorage.setItem('sim', String(selectedSim));
       await AsyncStorage.setItem('waType', whatsapp);
 
       Alert.alert('✅ Saved', 'Settings saved successfully');
@@ -41,7 +96,50 @@ export default function SettingScreen() {
     }
   };
 
-  const Option = ({ title, value, selected, onPress }) => (
+  // ✅ SIM fallback
+  useEffect(() => {
+    if (simList.length > 0 && selectedSim) {
+      const exists = simList.find(s => s.id === selectedSim);
+      if (!exists) {
+        setSelectedSim(simList[0].id);
+      }
+    }
+  }, [simList]);
+
+  // 🔥 SIM UI (UNCHANGED)
+  const SimOption = ({ item, index }) => {
+    const isActive = item.status === "ACTIVE";
+    const isSelected = selectedSim === item.id;
+
+    return (
+      <TouchableOpacity
+        disabled={!isActive}
+        onPress={() => setSelectedSim(item.id)}
+        style={[
+          styles.simCard,
+          isSelected && styles.selectedCard,
+          !isActive && styles.inactiveCard
+        ]}
+      >
+        <Text style={[
+          styles.simName,
+          isSelected && styles.selectedText
+        ]}>
+          {item.name} (SIM {index + 1})
+        </Text>
+
+        <Text style={[
+          styles.simStatus,
+          isActive ? styles.active : styles.inactive
+        ]}>
+          {isActive ? "✅ Active" : "❌ No Network"}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
+  // 🔥 COMMON OPTION
+  const Option = ({ title, selected, onPress }) => (
     <TouchableOpacity
       onPress={onPress}
       style={[
@@ -61,45 +159,46 @@ export default function SettingScreen() {
   return (
     <View style={styles.container}>
 
-      {/* SIM SECTION */}
+      {/* 📶 SIM SECTION */}
       <Text style={styles.heading}>📶 Select SIM</Text>
 
       <View style={styles.row}>
-        <Option
-          title="SIM 1"
-          value="SIM1"
-          selected={sim === 'SIM1'}
-          onPress={() => setSim('SIM1')}
-        />
-
-        <Option
-          title="SIM 2"
-          value="SIM2"
-          selected={sim === 'SIM2'}
-          onPress={() => setSim('SIM2')}
-        />
+        {simList.map((item, index) => (
+          <SimOption key={item.id} item={item} index={index} />
+        ))}
       </View>
 
-      {/* WHATSAPP SECTION */}
+      {/* 💬 WHATSAPP SECTION */}
       <Text style={styles.heading}>💬 WhatsApp Type</Text>
 
       <View style={styles.row}>
-        <Option
-          title="WhatsApp"
-          value="WHATSAPP"
-          selected={whatsapp === 'WHATSAPP'}
-          onPress={() => setWhatsapp('WHATSAPP')}
-        />
 
-        <Option
-          title="Business"
-          value="BUSINESS"
-          selected={whatsapp === 'BUSINESS'}
-          onPress={() => setWhatsapp('BUSINESS')}
-        />
+        {waApps.whatsapp && (
+          <Option
+            title="WhatsApp"
+            selected={whatsapp === 'WHATSAPP'}
+            onPress={() => setWhatsapp('WHATSAPP')}
+          />
+        )}
+
+        {waApps.business && (
+          <Option
+            title="WA Business"
+            selected={whatsapp === 'BUSINESS'}
+            onPress={() => setWhatsapp('BUSINESS')}
+          />
+        )}
+
       </View>
 
-      {/* SAVE BUTTON */}
+      {/* ❌ No WhatsApp */}
+      {!waApps.whatsapp && !waApps.business && (
+        <Text style={{ textAlign: 'center', color: 'red', marginBottom: 20 }}>
+          ❌ No WhatsApp installed
+        </Text>
+      )}
+
+      {/* 💾 SAVE */}
       <TouchableOpacity style={styles.btn} onPress={save}>
         <Text style={styles.btnText}>Save Settings</Text>
       </TouchableOpacity>
@@ -126,6 +225,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 25
+  },
+
+  simCard: {
+    flex: 1,
+    padding: 15,
+    marginHorizontal: 5,
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    elevation: 3
+  },
+
+  simName: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#333'
+  },
+
+  simStatus: {
+    marginTop: 6,
+    fontSize: 13,
+    fontWeight: '600'
+  },
+
+  active: {
+    color: 'green'
+  },
+
+  inactive: {
+    color: 'red'
+  },
+
+  inactiveCard: {
+    opacity: 0.5
   },
 
   optionCard: {

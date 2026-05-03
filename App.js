@@ -17,7 +17,8 @@ import SettingScreen from './src/SettingScreen';
 import SmsTemplate from './src/SmsTemplate';
 import ProfileScreen from './src/ProfileScreen';
 import HelpScreen from './src/HelpScreen';
-
+import SmsScreen from './src/SmsScreen';
+import GreetingScreen from './src/GreetingScreen';
 
 import { BASE_URL } from './src/config/config';
 
@@ -94,7 +95,14 @@ if (loading) {
               <Stack.Screen name="LoginScreen" options={{ headerShown: false }}>
                 {(props) => <LoginScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
               </Stack.Screen>
-              <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+              <Stack.Screen name="RegisterScreen" component={RegisterScreen}
+                options={({ navigation }) => ({
+                  headerTitle: 'Register ',
+                  headerStyle: { backgroundColor: 'teal' },
+                  headerTintColor: '#fff',
+                })}
+
+              />
           </>
           ) : !isLicenseValid ? (
             <Stack.Screen
@@ -142,15 +150,25 @@ if (loading) {
                                                                          headerStyle: { backgroundColor: 'teal' },
                                                                          headerTintColor: '#fff',
                                                                        }}/>
-        <Stack.Screen name="HelpScreen" component={HelpScreen}   options={{
-                                                                   headerTitle: 'Helpline',
+        <Stack.Screen name="SmsScreen" component={SmsScreen}   options={{
+                                                                   headerTitle: 'Bulk SMS',
                                                                    headerStyle: { backgroundColor: 'teal' },
                                                                    headerTintColor: '#fff',
                                                                  }}/>
+
+        <Stack.Screen name="GreetingScreen" component={GreetingScreen}   options={{
+                                                                   headerTitle: 'Greetings',
+                                                                   headerStyle: { backgroundColor: 'teal' },
+                                                                   headerTintColor: '#fff',
+                                                                 }}/>
+        <Stack.Screen name="HelpScreen" component={HelpScreen}   options={{
+                                                                   headerTitle: 'Help Line',
+                                                                   headerStyle: { backgroundColor: 'teal' },
+                                                                   headerTintColor: '#fff',
+                                                                 }}/>
+
           </>
           )}
-
-
         </Stack.Navigator>
     </NavigationContainer>
 

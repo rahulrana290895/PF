@@ -24,20 +24,19 @@ const requestAllPermissions = async () => {
     let permissions = [];
 
     if (Platform.Version >= 33) {
-      // Android 13+
       permissions = [
         PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
         PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
         PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE,
+        PermissionsAndroid.PERMISSIONS.READ_PHONE_NUMBERS,
         PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
         PermissionsAndroid.PERMISSIONS.SEND_SMS,
       ];
     } else {
-      // Android 12 and below
       permissions = [
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE,
+        PermissionsAndroid.PERMISSIONS.READ_PHONE_NUMBERS,
         PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
         PermissionsAndroid.PERMISSIONS.SEND_SMS,
       ];
@@ -45,7 +44,15 @@ const requestAllPermissions = async () => {
 
     const granted = await PermissionsAndroid.requestMultiple(permissions);
 
-    console.log("Permission Result:", granted);
+    const allGranted = Object.values(granted).every(
+      status => status === PermissionsAndroid.RESULTS.GRANTED
+    );
+
+    if (!allGranted) {
+      console.log("❌ Some permissions denied");
+    } else {
+      console.log("✅ All permissions granted");
+    }
 
   } catch (err) {
     console.warn(err);
@@ -86,16 +93,22 @@ const requestAllPermissions = async () => {
 
 
           <View style={styles.row}>
-            {/*<TouchableOpacity style={styles.card} onPress={() => navigation.navigate('SmsScreen')}>
-              <Image source={require('./assets/sms.png')} style={styles.iconImg} />
-              <Text style={styles.cardText}>SMS</Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('SmsScreen')}
+          >
+            <Image source={require('./assets/bulksms.png')} style={styles.iconImg} />
+            <Text style={styles.cardText}>Bulk SMS</Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('SettingScreen')}>
-              <Image source={require('./assets/setting.png')} style={styles.iconImg} />
-              <Text style={styles.cardText}>Setting</Text>
-            </TouchableOpacity>
-*/}
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('GreetingScreen')}
+          >
+            <Image source={require('./assets/greetings.png')} style={styles.iconImg} />
+            <Text style={styles.cardText}>Greetings</Text>
+          </TouchableOpacity>
+
           </View>
 
           <View style={styles.row}>
@@ -106,7 +119,6 @@ const requestAllPermissions = async () => {
             <Image source={require('./assets/user.png')} style={styles.iconImg} />
             <Text style={styles.cardText}>Profile</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.card}
             onPress={() => navigation.navigate('HelpScreen')}
@@ -114,7 +126,16 @@ const requestAllPermissions = async () => {
             <Image source={require('./assets/helpline.png')} style={styles.iconImg} />
             <Text style={styles.cardText}>Helpline</Text>
           </TouchableOpacity>
+          </View>
 
+          <View style={styles.row}>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('SettingScreen')}
+          >
+            <Image source={require('./assets/user.png')} style={styles.iconImg} />
+            <Text style={styles.cardText}>Setting</Text>
+          </TouchableOpacity>
           </View>
 
         </View>

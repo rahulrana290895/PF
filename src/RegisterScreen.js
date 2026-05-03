@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Image
 } from 'react-native';
 import { BASE_URL } from './config/config';
 import { useNavigation } from '@react-navigation/native';
@@ -48,6 +49,10 @@ const RegisterScreen = () => {
 
   return (
     <View style={styles.container}>
+          <Image
+            source={require('./assets/logo.png')}
+            style={styles.logo}
+          />
       <Text style={styles.heading}>Register</Text>
 
       <TextInput
@@ -90,10 +95,19 @@ const RegisterScreen = () => {
 export default RegisterScreen;
 
 const styles = StyleSheet.create({
+  logo: {
+    width: 200,
+    height: 200,
+    alignSelf: 'center',
+    marginBottom: 10,
+    resizeMode: 'contain',
+  },
+
   container: {
     flex: 1,
     justifyContent: 'center',
     padding: 25,
+    backgroundColor:'#FFF'
   },
   heading: {
     fontSize: 24,
@@ -107,6 +121,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
     borderRadius: 8,
+    color: 'teal',
   },
   button: {
     backgroundColor: 'teal',
