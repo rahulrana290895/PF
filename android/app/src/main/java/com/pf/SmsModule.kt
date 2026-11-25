@@ -16,7 +16,15 @@ class SmsModule(reactContext: ReactApplicationContext) :
 
     @ReactMethod
     fun setWhatsappType(type: String) {
+
         MyAccessibilityService.selectedWhatsapp = type
+
+        val prefs = reactApplicationContext
+            .getSharedPreferences("sms_templates", Context.MODE_PRIVATE)
+
+        prefs.edit()
+            .putString("wa_type", type)
+            .apply()
     }
 
     @ReactMethod

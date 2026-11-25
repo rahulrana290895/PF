@@ -133,9 +133,10 @@ const requestAllPermissions = async () => {
             style={styles.card}
             onPress={() => navigation.navigate('SettingScreen')}
           >
-            <Image source={require('./assets/user.png')} style={styles.iconImg} />
+            <Image source={require('./assets/setting.png')} style={styles.iconImg} />
             <Text style={styles.cardText}>Setting</Text>
           </TouchableOpacity>
+
           </View>
 
         </View>

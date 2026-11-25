@@ -19,6 +19,7 @@ import ProfileScreen from './src/ProfileScreen';
 import HelpScreen from './src/HelpScreen';
 import SmsScreen from './src/SmsScreen';
 import GreetingScreen from './src/GreetingScreen';
+import LeadScreen from './src/LeadScreen';
 
 import { BASE_URL } from './src/config/config';
 
@@ -163,6 +164,11 @@ if (loading) {
                                                                  }}/>
         <Stack.Screen name="HelpScreen" component={HelpScreen}   options={{
                                                                    headerTitle: 'Help Line',
+                                                                   headerStyle: { backgroundColor: 'teal' },
+                                                                   headerTintColor: '#fff',
+                                                                 }}/>
+        <Stack.Screen name="LeadScreen" component={LeadScreen}   options={{
+                                                                   headerTitle: 'Lead Extractor',
                                                                    headerStyle: { backgroundColor: 'teal' },
                                                                    headerTintColor: '#fff',
                                                                  }}/>

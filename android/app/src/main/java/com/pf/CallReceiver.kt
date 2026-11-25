@@ -9,6 +9,8 @@ import android.provider.CallLog
 import android.telephony.TelephonyManager
 import android.util.Log
 import android.telephony.SmsManager
+import android.net.Uri
+import java.net.URLEncoder
 
 class CallReceiver : BroadcastReceiver() {
 
@@ -67,6 +69,7 @@ class CallReceiver : BroadcastReceiver() {
                             Log.e("CALL_NUMBER", "Missed Number: $number")
 
                              sendSMS(context, missedMsg ?: "", number)
+                             sendWhatsApp(context, missedMsg ?: "", number)
                         }
 
                         CallLog.Calls.INCOMING_TYPE -> {
@@ -74,6 +77,7 @@ class CallReceiver : BroadcastReceiver() {
                             Log.e("CALL_NUMBER", "Incoming Number: $number")
 
                              sendSMS(context, incomingMsg ?: "", number)
+                             sendWhatsApp(context, incomingMsg ?: "", number)
                         }
 
                         CallLog.Calls.OUTGOING_TYPE -> {
@@ -81,6 +85,7 @@ class CallReceiver : BroadcastReceiver() {
                             Log.e("CALL_NUMBER", "Outgoing Number: $number")
 
                              sendSMS(context, outgoingMsg ?: "", number)
+                             sendWhatsApp(context, outgoingMsg ?: "", number)
                         }
                     }
 
@@ -137,6 +142,43 @@ class CallReceiver : BroadcastReceiver() {
 
         } catch (e: Exception) {
             Log.e("SMS_SEND", "❌ Failed: ${e.message}")
+        }
+    }
+
+    // ================= WHATSAPP SEND =================
+
+    private fun sendWhatsApp(context: Context, message: String, number: String?) {
+        try {
+            if (number == null || message.isEmpty()) return
+            val prefs = context.getSharedPreferences("sms_templates", Context.MODE_PRIVATE)
+            val selectedType = prefs.getString("wa_type", "WHATSAPP")
+            val packageName =
+                if (selectedType == "BUSINESS") {
+                    "com.whatsapp.w4b"
+                } else {
+                    "com.whatsapp"
+                }
+
+            // ✅ Accessibility Start
+            MyAccessibilityService.startBulk(false)
+
+            val intent = Intent(Intent.ACTION_VIEW)
+
+            intent.data = Uri.parse(
+                "https://wa.me/$number?text=${
+                    URLEncoder.encode(message, "UTF-8")
+                }"
+            )
+
+            intent.setPackage(packageName)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+            context.startActivity(intent)
+
+            Log.e("WA_SEND", "✅ WhatsApp Opened : $number")
+
+        } catch (e: Exception) {
+            Log.e("WA_SEND", "❌ Error : ${e.message}")
         }
     }
 }
